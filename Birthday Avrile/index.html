@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#EAF3EA">
+<title>Happy 18th, Avrile 🌿</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='80'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --bg:#FAF9F3;
+    --bg-alt:#EAF2EA;
+    --ink:#1E332A;
+    --ink-soft:#5B7267;
+    --green-50:#EEF5EE;
+    --green-100:#DCEBDD;
+    --green-300:#A9CDAF;
+    --green-500:#6E9E7E;
+    --green-600:#557F63;
+    --green-700:#3F6249;
+    --gold:#D2A24C;
+    --cream:#FFFFFF;
+    --shadow-soft: 0 20px 40px -24px rgba(31,58,46,.35);
+    --shadow-card: 0 12px 30px -18px rgba(31,58,46,.28);
+    --ease: cubic-bezier(.16,1,.3,1);
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    background:var(--bg-alt);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  body.locked{ overflow:hidden; height:100%; }
+  img,svg{ display:block; max-width:100%; }
+  button{ font-family:inherit; }
+
+  /* subtle premium backdrop behind the phone column on wide screens */
+  body{
+    background:
+      radial-gradient(1200px 800px at 15% -10%, #F3F9F1 0%, transparent 60%),
+      radial-gradient(1000px 700px at 110% 110%, #E3EFE4 0%, transparent 55%),
+      var(--bg-alt);
+  }
+
+  .app{
+    max-width:460px;
+    margin:0 auto;
+    min-height:100vh;
+    min-height:100svh;
+    background:var(--bg);
+    position:relative;
+    box-shadow:0 0 80px rgba(31,58,46,.10);
+    overflow-x:hidden;
+  }
+
+  /* ============ PROGRESS BAR ============ */
+  .progress{
+    position:fixed;
+    top:0; left:0; right:0;
+    height:3px;
+    background:var(--green-500);
+    transform:scaleX(0);
+    transform-origin:0 0;
+    z-index:70;
+    max-width:460px;
+    margin:0 auto;
+    transition:opacity .3s var(--ease);
+  }
+  body.picker-open .progress{ opacity:0; }
+
+  /* ============ SONG PICKER ============ */
+  .picker{
+    position:fixed;
+    inset:0;
+    max-width:460px;
+    margin:0 auto;
+    z-index:80;
+    display:flex;
+    align-items:center;
+    background:
+      radial-gradient(600px 500px at 50% -10%, var(--green-100) 0%, transparent 60%),
+      var(--bg);
+    transition:opacity .55s var(--ease), transform .55s var(--ease);
+  }
+  .picker.closing{ opacity:0; transform:scale(1.04); pointer-events:none; }
+  .picker-inner{
+    width:100%;
+    padding:32px 28px calc(28px + env(safe-area-inset-bottom));
+  }
+  .picker-eyebrow{
+    margin:0 0 10px;
+    font-size:13px;
+    letter-spacing:.02em;
+    color:var(--green-600);
+    font-weight:600;
+  }
+  .picker-title{
+    margin:0 0 30px;
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(28px,7.5vw,34px);
+    line-height:1.18;
+    color:var(--ink);
+  }
+  .song-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .song-card{
+    background:var(--cream);
+    border:1px solid rgba(63,98,73,.08);
+    border-radius:20px;
+    padding:18px 14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    text-align:center;
+    cursor:pointer;
+    box-shadow:var(--shadow-card);
+    transform:scale(1);
+    transition:transform .18s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .song-card:active{ transform:scale(.95); }
+  .song-card .icon-wrap{
+    width:52px; height:52px;
+    border-radius:50%;
+    background:var(--green-100);
+    color:var(--green-700);
+    display:flex; align-items:center; justify-content:center;
+    transition:background .3s var(--ease), color .3s var(--ease);
+  }
+  .song-card svg{ width:24px; height:24px; }
+  .song-card .song-title{ font-weight:700; font-size:14.5px; }
+  .song-card .song-artist{ font-size:12px; color:var(--ink-soft); }
+  .song-card.selected{ background:var(--green-600); box-shadow:0 16px 30px -16px rgba(63,98,73,.55); }
+  .song-card.selected .icon-wrap{ background:rgba(255,255,255,.18); color:#fff; }
+  .song-card.selected .song-title,
+  .song-card.selected .song-artist{ color:#fff; }
+
+  .skip-btn{
+    display:block;
+    margin:26px auto 0;
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    cursor:pointer;
+  }
+
+  /* ============ MAIN ============ */
+  .main{
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .main.visible{ opacity:1; transform:none; }
+
+  section{ padding:64px 28px; position:relative; }
+
+  .section-eyebrow{
+    margin:0 0 8px;
+    font-size:13px;
+    color:var(--green-600);
+    font-weight:600;
+  }
+  .section-title{
+    margin:0 0 28px;
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(24px,6.5vw,28px);
+    color:var(--ink);
+  }
+
+  /* reveal-on-scroll */
+  .reveal{ opacity:0; transform:translateY(22px); transition:opacity .8s var(--ease), transform .8s var(--ease); }
+  .reveal.in-view{ opacity:1; transform:none; }
+
+  /* ---- HERO ---- */
+  .hero{
+    min-height:92vh;
+    min-height:92svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px 28px;
+    overflow:hidden;
+  }
+  .ambient{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .ambient span{
+    position:absolute;
+    bottom:-40px;
+    color:var(--green-300);
+    opacity:.55;
+    animation:float-up linear infinite;
+    will-change:transform;
+  }
+  .ambient span svg{ width:20px; height:20px; }
+  @keyframes float-up{
+    0%{ transform:translateY(0) rotate(0deg); opacity:0; }
+    10%{ opacity:.55; }
+    90%{ opacity:.4; }
+    100%{ transform:translateY(-115vh) rotate(200deg); opacity:0; }
+  }
+
+  .hero-badge{
+    width:64px; height:64px;
+    border-radius:50%;
+    background:var(--green-600);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:24px;
+    margin-bottom:22px;
+    box-shadow:var(--shadow-soft);
+    position:relative; z-index:1;
+  }
+  .hero-title{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(34px,10vw,44px);
+    line-height:1.12;
+    margin:0 0 14px;
+    position:relative; z-index:1;
+  }
+  .hero-title span{ color:var(--green-600); font-style:italic; }
+  .hero-sub{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:15.5px;
+    position:relative; z-index:1;
+  }
+  .scroll-cue{
+    margin-top:52px;
+    width:26px; height:42px;
+    border:2px solid var(--green-300);
+    border-radius:14px;
+    position:relative; z-index:1;
+  }
+  .scroll-cue span{
+    position:absolute;
+    top:7px; left:50%;
+    width:4px; height:8px;
+    margin-left:-2px;
+    background:var(--green-500);
+    border-radius:2px;
+    animation:cue 1.6s ease-in-out infinite;
+  }
+  @keyframes cue{
+    0%,100%{ transform:translateY(0); opacity:1; }
+    50%{ transform:translateY(12px); opacity:.3; }
+  }
+
+  /* ---- DIVIDER ---- */
+  .divider{ padding:0 28px; }
+  .divider svg{ width:100%; height:auto; color:var(--green-300); }
+
+  /* ---- PRESENT ---- */
+  .present-section{ text-align:center; }
+  .gift{
+    margin:12px auto 0;
+    width:200px;
+    position:relative;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .gift-box{
+    width:180px; height:120px;
+    margin:0 auto;
+    background:linear-gradient(160deg, var(--green-500), var(--green-700));
+    border-radius:10px;
+    position:relative;
+    box-shadow:var(--shadow-soft);
+    transition:transform .5s var(--ease);
+  }
+  .gift.open .gift-box{ transform:scale(1.03); }
+  .gift-ribbon-v{
+    position:absolute; top:0; bottom:0; left:50%;
+    width:18px; margin-left:-9px;
+    background:var(--gold);
+  }
+  .gift-ribbon-h{
+    position:absolute; left:0; right:0; top:50%;
+    height:18px; margin-top:-9px;
+    background:var(--gold);
+  }
+  .gift-lid{
+    width:200px; height:46px;
+    margin:0 auto;
+    background:linear-gradient(160deg, var(--green-600), var(--green-700));
+    border-radius:12px 12px 4px 4px;
+    position:relative;
+    transform-origin:50% 100%;
+    transition:transform .7s var(--ease);
+    box-shadow:0 8px 16px -8px rgba(31,58,46,.4);
+  }
+  .gift-lid::after{
+    content:"";
+    position:absolute;
+    left:50%; top:-16px;
+    width:34px; height:34px;
+    margin-left:-17px;
+    border-radius:50%;
+    background:var(--gold);
+    box-shadow:-18px 6px 0 -6px var(--gold), 18px 6px 0 -6px var(--gold);
+  }
+  .gift.open .gift-lid{
+    transform:translateY(-150px) rotate(-18deg);
+  }
+  .gift-hint{
+    margin:22px 0 0;
+    font-size:13px;
+    color:var(--ink-soft);
+    transition:opacity .4s var(--ease);
+  }
+  .gift.open .gift-hint{ opacity:0; }
+
+  .gift-reveal{
+    max-width:340px;
+    margin:0 auto;
+    max-height:0;
+    opacity:0;
+    overflow:hidden;
+    transition:max-height .7s var(--ease), opacity .6s var(--ease) .1s;
+  }
+  .gift.open + .gift-reveal,
+  .gift-reveal.open{ max-height:400px; opacity:1; }
+  .gift-reveal-inner{
+    margin-top:28px;
+    padding:22px;
+    background:var(--green-50);
+    border-radius:18px;
+    font-family:var(--serif);
+    font-size:17px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+
+  /* ---- LETTER ---- */
+  .letter{
+    background:var(--cream);
+    border-radius:22px;
+    padding:34px 26px;
+    box-shadow:var(--shadow-card);
+    position:relative;
+  }
+  .letter::before{
+    content:"“";
+    position:absolute;
+    top:-6px; left:20px;
+    font-family:var(--serif);
+    font-size:76px;
+    color:var(--green-100);
+    line-height:1;
+  }
+  .letter-greeting{
+    font-family:var(--serif);
+    font-size:20px;
+    margin:0 0 18px;
+    color:var(--green-700);
+  }
+  .letter p{
+    margin:0 0 16px;
+    font-size:15.5px;
+    line-height:1.75;
+    color:var(--ink);
+  }
+  .letter p:last-of-type{ margin-bottom:0; }
+  .letter-sign{
+    margin-top:22px !important;
+    font-family:var(--serif);
+    font-style:italic;
+    color:var(--green-700);
+  }
+  .placeholder{ color:var(--ink-soft); }
+
+  /* ---- CLOSING / CANDLES ---- */
+  .closing{ text-align:center; }
+  .cake{
+    width:190px; height:70px;
+    margin:0 auto;
+    background:linear-gradient(180deg, #fff, var(--green-50));
+    border:1px solid rgba(63,98,73,.08);
+    border-radius:16px 16px 26px 26px;
+    box-shadow:var(--shadow-card);
+    position:relative;
+  }
+  .candles{
+    display:flex;
+    justify-content:center;
+    gap:22px;
+    margin-bottom:-14px;
+    position:relative;
+    z-index:1;
+  }
+  .candle{ cursor:pointer; -webkit-tap-highlight-color:transparent; padding:6px; }
+  .candle .stick{
+    width:8px; height:34px;
+    margin:0 auto;
+    background:var(--gold);
+    border-radius:2px;
+  }
+  .candle .flame{
+    width:12px; height:16px;
+    margin:0 auto 2px;
+    background:radial-gradient(circle at 50% 30%, #FFE29A, var(--gold) 70%);
+    border-radius:50% 50% 50% 50% / 65% 65% 35% 35%;
+    transform-origin:50% 100%;
+    transition:transform .4s var(--ease), opacity .4s var(--ease);
+    animation:flicker 1.6s ease-in-out infinite;
+  }
+  .candle.out .flame{ transform:scale(0); opacity:0; animation:none; }
+  @keyframes flicker{
+    0%,100%{ transform:scale(1) rotate(-2deg); }
+    50%{ transform:scale(1.08) rotate(2deg); }
+  }
+  .closing h2{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:24px;
+    margin:36px 0 8px;
+  }
+  .closing-hint{ margin:0 0 26px; color:var(--ink-soft); font-size:14px; }
+  .closing-message{
+    font-family:var(--serif);
+    font-size:19px;
+    color:var(--green-700);
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .closing-message.show{ opacity:1; transform:none; }
+
+  .footer{
+    text-align:center;
+    padding:40px 28px calc(120px + env(safe-area-inset-bottom));
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+
+  /* ---- CONFETTI ---- */
+  .confetti-layer{
+    position:fixed; inset:0;
+    max-width:460px; margin:0 auto;
+    pointer-events:none;
+    z-index:90;
+    overflow:hidden;
+  }
+  .confetti-piece{
+    position:absolute;
+    top:-20px;
+    width:8px; height:14px;
+    border-radius:2px;
+    opacity:.95;
+    animation:confetti-fall 2.6s ease-in forwards;
+    will-change:transform;
+  }
+  @keyframes confetti-fall{
+    to{ transform:translateY(105vh) rotate(540deg); opacity:0; }
+  }
+
+  /* ---- MINI PLAYER ---- */
+  .mini-player{
+    position:fixed;
+    left:50%;
+    bottom:18px;
+    transform:translate(-50%,0);
+    width:calc(100% - 40px);
+    max-width:400px;
+    background:rgba(255,255,255,.72);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid rgba(255,255,255,.6);
+    border-radius:20px;
+    box-shadow:0 16px 40px -14px rgba(31,58,46,.4);
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    z-index:60;
+    transition:opacity .5s var(--ease), transform .5s var(--ease);
+    margin-bottom:env(safe-area-inset-bottom);
+  }
+  .mini-player.hidden{ opacity:0; transform:translate(-50%,20px); pointer-events:none; }
+  .mini-play-btn{
+    width:38px; height:38px;
+    border-radius:50%;
+    background:var(--green-600);
+    border:none;
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    cursor:pointer;
+    transition:transform .15s var(--ease);
+  }
+  .mini-play-btn:active{ transform:scale(.9); }
+  .mini-play-btn svg{ width:16px; height:16px; }
+  .mini-play-btn .icon-pause{ display:none; }
+  .mini-play-btn.playing .icon-play{ display:none; }
+  .mini-play-btn.playing .icon-pause{ display:block; }
+  .mini-info{ flex:1; min-width:0; }
+  .mini-title{
+    font-size:13px; font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .mini-artist{ font-size:11.5px; color:var(--ink-soft); }
+  .mini-bar{
+    position:absolute;
+    left:14px; right:14px; bottom:5px;
+    height:2.5px;
+    background:rgba(63,98,73,.12);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .mini-bar-fill{
+    height:100%; width:100%;
+    background:var(--green-500);
+    transform:scaleX(0);
+    transform-origin:0 0;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body class="locked picker-open">
+
+<div class="app">
+
+  <div class="progress" id="progress"></div>
+
+  <!-- ================= SONG PICKER ================= -->
+  <section class="picker" id="picker">
+    <div class="picker-inner">
+      <p class="picker-eyebrow">before we begin</p>
+      <h1 class="picker-title">pick the song for<br>your birthday page</h1>
+      <div class="song-grid" id="songGrid"></div>
+      <button class="skip-btn" id="skipBtn">continue without music</button>
+    </div>
+  </section>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main" id="main">
+
+    <div class="ambient" id="ambient" aria-hidden="true"></div>
+
+    <section class="hero">
+      <div class="hero-badge">18</div>
+      <h1 class="hero-title">Happy Birthday,<br><span>Avrile</span></h1>
+      <p class="hero-sub">a little something, made just for you 🌿</p>
+      <div class="scroll-cue" aria-hidden="true"><span></span></div>
+    </section>
+
+    <div class="divider" aria-hidden="true">
+      <svg viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 12 C 60 -4, 100 28, 160 12 S 260 -4, 320 12 S 380 24, 400 12" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="120" cy="14" r="3" fill="currentColor"/>
+        <circle cx="280" cy="10" r="3" fill="currentColor"/>
+      </svg>
+    </div>
+
+    <section class="present-section">
+      <p class="section-eyebrow reveal">a small gift</p>
+      <h2 class="section-title reveal">Open when you're ready</h2>
+
+      <div class="gift reveal" id="gift">
+        <div class="gift-lid"></div>
+        <div class="gift-box">
+          <div class="gift-ribbon-v"></div>
+          <div class="gift-ribbon-h"></div>
+        </div>
+        <p class="gift-hint" id="giftHint">Tap the box to open it</p>
+      </div>
+      <div class="gift-reveal" id="giftReveal">
+        <div class="gift-reveal-inner">
+          <span class="placeholder">Anong tawag nung baka nung nakasalubong ka? Edii.... cow ba yan? HAHAHAHAHHAHAHAHAHAHHAHAHA</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider" aria-hidden="true">
+      <svg viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 12 C 60 -4, 100 28, 160 12 S 260 -4, 320 12 S 380 24, 400 12" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="120" cy="14" r="3" fill="currentColor"/>
+        <circle cx="280" cy="10" r="3" fill="currentColor"/>
+      </svg>
+    </div>
+
+    <section class="message-section">
+      <p class="section-eyebrow reveal">For you</p>
+      <h2 class="section-title reveal">a few words</h2>
+      <div class="letter reveal">
+        <p class="letter-greeting">Dear Avrile,</p>
+        <p><span class="placeholder">Hi Avrile! Sabi nila kailangan daw maging sweet muna ako, kaya no choice ako :( HAHAHAHA anyways, ilang months na rin since nung last na nagkita
+          tayo. I'm so proud of how much you've grown, and I hope you'll keep growing into someone even more amazing. May you achieve all the dreams you've always wanted for yourself.
+          And along the way, malamang may mga struggles and hardships ka ring haharapin. When that happens, sana maging ikaw yung babaeng kilala ko, yung patuloy na sumusulong despite the hardships.</span></p>
+        <p><span class="placeholder">I'm so grateful na nakilala kita. Without you, I wouldn't be who I am today. Even with our ups and downs, mas malaki pa rin yung bond natin kaysa doon.
+          And I'm just so thankful to have someone as amazing as you in my life. You are amazing. You will always be amazing. And alam kong marami ka pang gagawing magagandaa.
+          Be the person you've always wanted to become, and when you do, I'll always be here with you.
+        </span></p>
+        <p><span class="placeholder">I hope you appreciate this short message HAHAHAHAHA Yun lang, enjoy your day, and I wish for more birthdays to come!!</span></p>
+        <p class="letter-sign">— Blaire</p>
+      </div>
+    </section>
+
+    <div class="divider" aria-hidden="true">
+      <svg viewBox="0 0 400 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 12 C 60 -4, 100 28, 160 12 S 260 -4, 320 12 S 380 24, 400 12" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="120" cy="14" r="3" fill="currentColor"/>
+        <circle cx="280" cy="10" r="3" fill="currentColor"/>
+      </svg>
+    </div>
+
+    <section class="closing">
+      <div class="cake reveal">
+        <div class="candles" id="candles">
+          <div class="candle" data-idx="0"><div class="flame"></div><div class="stick"></div></div>
+          <div class="candle" data-idx="1"><div class="flame"></div><div class="stick"></div></div>
+          <div class="candle" data-idx="2"><div class="flame"></div><div class="stick"></div></div>
+        </div>
+      </div>
+      <h2 class="reveal">make a wish 🎂</h2>
+      <p class="closing-hint reveal">Tap each candle to blow it out</p>
+      <p class="closing-message" id="closingMessage">Happy 18th Birthday, Avrile! 🌿</p>
+    </section>
+
+    <footer class="footer">Made with love and walang kaplastikan, 2026</footer>
+
+  </main>
+
+  <!-- ================= MINI PLAYER ================= -->
+  <div class="mini-player hidden" id="miniPlayer">
+    <button class="mini-play-btn" id="playPauseBtn" aria-label="Play or pause">
+      <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+    <div class="mini-info">
+      <div class="mini-title" id="miniTitle">Song title</div>
+      <div class="mini-artist" id="miniArtist">Artist</div>
+    </div>
+    <div class="mini-bar"><div class="mini-bar-fill" id="miniFill"></div></div>
+  </div>
+
+  <audio id="audio" preload="none"></audio>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     EDIT ME: your four songs.
+     - title / artist: shown on the picker + mini player
+     - src: path to an audio file you upload alongside this page
+       (e.g. put files in a "songs" folder next to index.html)
+     icon: "leaf" | "star" | "heart" | "spark"
+  ============================================================ */
+  const SONGS = [
+    { title: "Your Universe",   artist: "Rico Blanco", src: "songs/song-1.mp3", icon: "leaf"  },
+    { title: "Dancing Queen",   artist: "ABBA", src: "songs/song-2.mp3", icon: "heart" },
+    { title: "Count on Me", artist: "Bruno Mars", src: "songs/song-3.mp3", icon: "star"  },
+    { title: "Minsan",  artist: "Eraserheads", src: "songs/song-4.mp3", icon: "spark" }
+  ];
+
+  const ICONS = {
+    leaf:  '<path d="M20 3C10 3 3 10 3 20c8 0 15-7 15-15z"/><path d="M4 20c0-6 4-11 10-13" stroke="currentColor" stroke-width="1.4" fill="none"/>',
+    heart: '<path d="M12 21s-7.5-4.9-10-9.6C.4 8 2.3 4 6.1 4c2.1 0 3.7 1.1 4.5 2.6C11.4 5.1 13 4 15.1 4c3.8 0 5.7 4 4.1 7.4C19.5 16.1 12 21 12 21z"/>',
+    star:  '<path d="M12 2l2.9 6.6L22 9.3l-5.3 4.8L18.2 21 12 17.3 5.8 21l1.5-6.9L2 9.3l7.1-.7z"/>',
+    spark: '<path d="M12 2c.6 4 2.5 6 6 7-3.5 1-5.4 3-6 7-.6-4-2.5-6-6-7 3.5-1 5.4-3 6-7z"/>'
+  };
+
+  const audio = document.getElementById('audio');
+  const songGrid = document.getElementById('songGrid');
+  const picker = document.getElementById('picker');
+  const skipBtn = document.getElementById('skipBtn');
+  const main = document.getElementById('main');
+  const miniPlayer = document.getElementById('miniPlayer');
+  const miniTitle = document.getElementById('miniTitle');
+  const miniArtist = document.getElementById('miniArtist');
+  const miniFill = document.getElementById('miniFill');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const progress = document.getElementById('progress');
+
+  /* ---------- build song cards ---------- */
+  SONGS.forEach((song, i) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'song-card';
+    card.innerHTML =
+      '<span class="icon-wrap"><svg viewBox="0 0 24 24" fill="currentColor">' + (ICONS[song.icon] || ICONS.leaf) + '</svg></span>' +
+      '<span class="song-title">' + song.title + '</span>' +
+      '<span class="song-artist">' + song.artist + '</span>';
+    card.addEventListener('click', () => selectSong(i, card));
+    songGrid.appendChild(card);
+  });
+
+  function selectSong(index, cardEl){
+    document.querySelectorAll('.song-card').forEach(c => c.classList.remove('selected'));
+    cardEl.classList.add('selected');
+
+    const song = SONGS[index];
+    audio.src = song.src;
+    audio.play().catch(() => { /* file not added yet — picker still proceeds */ });
+
+    miniTitle.textContent = song.title;
+    miniArtist.textContent = song.artist;
+    miniPlayer.classList.remove('hidden');
+    playPauseBtn.classList.add('playing');
+
+    setTimeout(enterSite, 220);
+  }
+
+  skipBtn.addEventListener('click', enterSite);
+
+  function enterSite(){
+    picker.classList.add('closing');
+    document.body.classList.remove('locked', 'picker-open');
+    setTimeout(() => {
+      picker.style.display = 'none';
+      main.classList.add('visible');
+    }, 500);
+  }
+
+  /* ---------- mini player controls ---------- */
+  playPauseBtn.addEventListener('click', () => {
+    if (!audio.src) return;
+    if (audio.paused){
+      audio.play().catch(() => {});
+      playPauseBtn.classList.add('playing');
+    } else {
+      audio.pause();
+      playPauseBtn.classList.remove('playing');
+    }
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    if (audio.duration){
+      miniFill.style.transform = 'scaleX(' + (audio.currentTime / audio.duration) + ')';
+    }
+  });
+
+  /* ---------- ambient floating leaves (hero only, cheap + subtle) ---------- */
+  const ambient = document.getElementById('ambient');
+  for (let i = 0; i < 6; i++){
+    const el = document.createElement('span');
+    el.style.left = (8 + Math.random() * 84) + '%';
+    el.style.animationDuration = (9 + Math.random() * 7) + 's';
+    el.style.animationDelay = (Math.random() * 8) + 's';
+    el.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor">' + ICONS.leaf + '</svg>';
+    ambient.appendChild(el);
+  }
+
+  /* ---------- scroll reveal ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('in-view'));
+  }
+
+  /* ---------- scroll progress bar (rAF-throttled) ---------- */
+  let ticking = false;
+  function updateProgress(){
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? scrollTop / docHeight : 0;
+    progress.style.transform = 'scaleX(' + pct + ')';
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if (!ticking){ requestAnimationFrame(updateProgress); ticking = true; }
+  }, { passive: true });
+
+  /* ---------- present unwrapping ---------- */
+  const gift = document.getElementById('gift');
+  const giftReveal = document.getElementById('giftReveal');
+  let giftOpened = false;
+
+  gift.addEventListener('click', () => {
+    gift.classList.toggle('open');
+    giftReveal.classList.toggle('open');
+    if (gift.classList.contains('open') && !giftOpened){
+      giftOpened = true;
+      burstConfetti(36);
+    }
+  });
+
+  /* ---------- candles ---------- */
+  const candleEls = document.querySelectorAll('.candle');
+  const closingMessage = document.getElementById('closingMessage');
+  let blownOut = 0;
+  let wishGranted = false;
+
+  candleEls.forEach(c => {
+    c.addEventListener('click', () => {
+      const wasOut = c.classList.contains('out');
+      c.classList.toggle('out');
+      blownOut += wasOut ? -1 : 1;
+
+      if (blownOut === candleEls.length && !wishGranted){
+        wishGranted = true;
+        closingMessage.classList.add('show');
+        burstConfetti(48);
+      }
+    });
+  });
+
+  /* ---------- lightweight confetti ---------- */
+  const CONFETTI_COLORS = ['#6E9E7E', '#3F6249', '#D2A24C', '#A9CDAF', '#FFFFFF'];
+
+  function burstConfetti(count){
+    const layer = document.createElement('div');
+    layer.className = 'confetti-layer';
+    document.body.appendChild(layer);
+
+    for (let i = 0; i < count; i++){
+      const piece = document.createElement('span');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+      piece.style.animationDelay = (Math.random() * 0.4) + 's';
+      piece.style.animationDuration = (2.1 + Math.random() * 1.2) + 's';
+      piece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+      layer.appendChild(piece);
+    }
+    setTimeout(() => layer.remove(), 3800);
+  }
+})();
+</script>
+</body>
+</html>
